@@ -3,8 +3,15 @@ package com.daily.demo.java8;
 import com.daily.demo.java8.bean.Dish;
 import com.google.common.collect.Lists;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.IntSummaryStatistics;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.*;
+
 
 /**
  * @author fanzhengjie
@@ -31,7 +38,10 @@ public class TestReduce {
         optionalSum(Lists.newArrayList());
         MaxMin(numbers);
         testDish();
-
+        testCount();
+        testGroup();
+        testPartitioning();
+        System.out.println(partitionPrimes(10));
     }
 
     public static Integer sum(List<Integer> list){
@@ -64,5 +74,106 @@ public class TestReduce {
         //方法2
         long count2 = menu.stream().count();
         System.out.format("一共有%d道菜肴\n", count2);
+    }
+
+    public static void testCount(){
+        long howManyDishs = menu.stream().collect(counting());
+        System.out.println("有"+howManyDishs+"道菜！");
+        howManyDishs = menu.stream().count();
+        System.out.println("有"+howManyDishs+"道菜！");
+
+        //找最大
+        Optional<Dish> mostCalories = menu.stream()
+            .collect(maxBy(Comparator.comparingInt(Dish::getCalories)));
+        System.out.println(mostCalories.isPresent()?mostCalories.get():"null");
+
+        //统计信息
+        IntSummaryStatistics intSummaryStatistics = menu.stream()
+            .collect(summarizingInt(Dish::getCalories));
+        System.out.println(intSummaryStatistics);
+
+        //连接字符串
+        String menuname = menu.stream().map(Dish::getName).collect(joining(","));
+        System.out.println(menuname);
+    }
+
+    public static void testGroup(){
+        Map<Dish.Type, List<Dish>> dishByType = menu.stream()
+            .collect(groupingBy(Dish::getType));
+        System.out.println(dishByType);
+
+        //按自定义类型分组
+        Map<CaloricLevel, List<Dish>> dishByLevel = menu.stream()
+            .collect(groupingBy(dish -> {
+                    if(dish.getCalories() <= 400)
+                        return CaloricLevel.DIET;
+                    else if(dish.getCalories() <= 700)
+                        return CaloricLevel.NORMAL;
+                    else
+                        return CaloricLevel.FAT;
+            }));
+        System.out.println(dishByLevel);
+
+        //多级分组
+        Map<Dish.Type, Map<CaloricLevel, List<Dish>>> dishesByTypeCaloricLevel = menu.stream()
+            .collect(groupingBy(Dish::getType, groupingBy(dish -> {
+                if(dish.getCalories() <= 400)
+                    return CaloricLevel.DIET;
+                else if(dish.getCalories() <= 700)
+                    return CaloricLevel.NORMAL;
+                else
+                    return CaloricLevel.FAT;
+            })));
+        System.out.println(dishesByTypeCaloricLevel);
+
+        //按子组收集数据
+        Map<Dish.Type, Long> typesCount = menu.stream()
+            .collect(groupingBy(Dish::getType, counting()));
+        System.out.println(typesCount);
+
+        //找到每个类型热量最大的
+        Map<Dish.Type, Optional<Dish>> mostCaloricByType = menu.stream()
+            .collect(groupingBy(Dish::getType, maxBy(Comparator.comparing(Dish::getCalories))));
+        System.out.println(mostCaloricByType);
+
+        //把收集器到的结果转换为另一种类型
+        Map<Dish.Type, Dish> mostCaloricByType2 = menu.stream()
+            .collect(groupingBy(Dish::getType, collectingAndThen(maxBy(Comparator.comparing(Dish::getCalories)),Optional::get)));
+        System.out.println(mostCaloricByType2);
+
+        //与groupingBy联合使用的其他收集器的例子
+        Map<Dish.Type, Integer> totalCaloriesByType = menu.stream()
+            .collect(groupingBy(Dish::getType, summingInt(Dish::getCalories)));
+        System.out.println(totalCaloriesByType);
+
+    }
+
+    public static void testPartitioning(){//分区
+        Map<Boolean, List<Dish>> partitionedMenu = menu.stream()
+            .collect(partitioningBy(Dish::isVegetarian));
+        partitionedMenu.get(true);
+        System.out.println(partitionedMenu);
+
+        Map<Boolean, Dish> mostCaloricPartitionedByVegetarian = menu.stream()
+            .collect(partitioningBy(Dish::isVegetarian, collectingAndThen(maxBy(Comparator.comparingInt(Dish::getCalories)), Optional::get)));
+        System.out.println(mostCaloricPartitionedByVegetarian);
+    }
+
+    public static enum CaloricLevel{
+        DIET, NORMAL, FAT
+    }
+
+    //按数字将质数和非质数分区
+    public static Map<Boolean, List<Integer>> partitionPrimes(int n){
+        return IntStream.rangeClosed(2, n).boxed()
+            .collect(partitioningBy(candidate -> isPrime(candidate)));
+    }
+
+
+    //判断是否为质数
+    public static boolean isPrime(int candidate){
+        int candidateRoot = (int) Math.sqrt(candidate);
+        return IntStream.rangeClosed(2, candidateRoot)
+            .noneMatch(i -> candidate%i == 0);
     }
 }
