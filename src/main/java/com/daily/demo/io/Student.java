@@ -1,5 +1,8 @@
 package com.daily.demo.io;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
@@ -11,7 +14,7 @@ public class Student implements Serializable{
 
     private String stuno;
     private String stuname;
-    private int stuage;
+    private transient int stuage;//该元素不会进行jvm默认的序列化,也可以自己完成这个元素的序列化
 
     public Student(){}
 
@@ -52,5 +55,15 @@ public class Student implements Serializable{
             ", stuname='" + stuname + '\'' +
             ", stuage=" + stuage +
             '}';
+    }
+
+    private void writeObject(ObjectOutputStream s) throws IOException{
+        s.defaultWriteObject();//把jvm能默认序列化的元素进行序列化操作
+        s.writeInt(stuage);//自己完成stuage的序列化
+    }
+
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException{
+        s.defaultReadObject();//把jvm能默认反序列化的元素进行反序列化操作
+        this.stuage = s.readInt();//自己完成stuage的反序列化
     }
 }

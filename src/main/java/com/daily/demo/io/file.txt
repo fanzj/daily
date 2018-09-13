@@ -50,3 +50,10 @@ java的文本(char)是16位无符号整数，是字符的unicode编码(双字节
 3)序列化接口(Serializable)
   对象必须实现序列化接口，才能进行序列化，否则将出现异常
   这个接口，没有任何方法，只是一个标准
+4)transient关键字
+  private void writeObject(ObjectOutputStream s) throws IOException
+  private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException
+
+  分析ArrayList源码中序列化和反序列化的问题
+
+5)序列化中子类和父类构造函数的调用问题
