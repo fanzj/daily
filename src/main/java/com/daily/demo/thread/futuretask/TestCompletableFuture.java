@@ -40,9 +40,15 @@ public class TestCompletableFuture {
 			System.out.println("result="+result);
 		}catch(ArithmeticException e){
 			//异常类型被转换了，待研究
-			System.out.println("it is ArithmeticException error");
+			//System.out.println("it is ArithmeticException error");
 		}catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
+			//异常正常获取方法
+			Throwable throwable = e.getCause();
+			if(throwable instanceof ArithmeticException){
+				System.out.println("it is ArithmeticException error");
+				throwable.printStackTrace();
+			}
 		}
 		
 	}
