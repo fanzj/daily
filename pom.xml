@@ -31,6 +31,12 @@
       <artifactId>guava</artifactId>
       <version>23.1-jre</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.rabbitmq</groupId>
+      <artifactId>amqp-client</artifactId>
+      <version>4.2.1</version>
+    </dependency>
   </dependencies>
 
   <build>
