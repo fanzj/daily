@@ -20,7 +20,7 @@ import java.util.concurrent.TimeoutException;
 public class RabbitConsumer {
 
     private static final String QUEUE_NAME = "queue_demo";
-    private static final String IP_ADDRESS = "192.168.21.227";
+    private static final String IP_ADDRESS = "127.0.0.1";
     private static final int PORT = 5672;//默认端口
 
     public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
@@ -28,8 +28,8 @@ public class RabbitConsumer {
             new Address(IP_ADDRESS, PORT)
         };
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setUsername("root");
-        factory.setPassword("root123");
+        factory.setUsername("admin");
+        factory.setPassword("admin");
         //连接方式与生产者略有区别
         Connection connection = factory.newConnection(addresses);//创建连接
         final Channel channel = connection.createChannel();//创建信道

@@ -11,22 +11,22 @@ import java.util.concurrent.TimeoutException;
  * @author fanzhengjie
  * @create 2019/1/8 上午11:33
  * @description 生产者
- * 注：本机mq环境还未搭建
+ * 注：本机mq环境已搭建，可正常运行，控制后台地址：http://localhost:15672/#/queues
  */
 public class RabbitProducer {
 
     private static final String EXCHANGE_NAME = "exchange_demo";
     private static final String ROUTING_KEY = "routingkey_demo";
     private static final String QUEUE_NAME = "queue_demo";
-    private static final String IP_ADDRESS = "192.168.21.227";
+    private static final String IP_ADDRESS = "127.0.0.1";
     private static final int PORT = 5672;//默认端口
 
     public static void main(String[] args) throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(IP_ADDRESS);
         factory.setPort(PORT);
-        factory.setUsername("root");
-        factory.setPassword("root123");
+        factory.setUsername("admin");
+        factory.setPassword("admin");
         Connection connection = factory.newConnection();//创建连接
         Channel channel = connection.createChannel();//创建信道
         //创建一个type="direct"、持久化的、非自动删除的交换器
